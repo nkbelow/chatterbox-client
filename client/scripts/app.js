@@ -1,7 +1,6 @@
 const app = {
   server: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
   init: () => {
-    //$("#send .submit").bind("submit", app.handleSubmit)
   },
   send: (message) => {
     $.ajax({
@@ -10,7 +9,7 @@ const app = {
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: (data) => {
-        //app.renderMessage(data);
+        app.fetch(data.objectId);
         console.log(`Message Id: ${data.objectId}, Created at: ${data.createdAt}`);
       },
       error: (data) => {
@@ -20,8 +19,9 @@ const app = {
   },
   fetch: () => {
     $.ajax({
-      url: app.server,
+      url: url,
       type: 'GET',
+      data: 'order=-createdAt',
       contentType: 'application/json',
       success: (data) => {
         for (let i = 0; i < data.results.length; i++) {
@@ -32,15 +32,15 @@ const app = {
         console.log('chatterbox: Message sent');
       },
       error: (data) => {
-        console.error('chatterbox: Failed to send message', data);
+        console.error('chatterbox: Failed to send message:', data);
       }
     })
   },
   clearMessages: () => {
     $('#chats').html([])
   },
-  renderMessage: ({username, text}) => {
-    let $msg = $(`<div class="username"><div class="usersName">${capitalizeName(username)}</div><div>${text}</div></div>`);
+  renderMessage: ({username, text, roomname}) => {
+    let $msg = $(`<div class="username"><div><span class="usersName">${capitalizeName(username)}</span> in ${roomname} room</div><div>${text}</div></div>`);
     $msg.on('click', app.handleUsernameClick);
     $('#chats').prepend($msg);
   },
@@ -52,7 +52,7 @@ const app = {
     alert(`You are now following user ${capitalizeName(userName)}`)
   },
   handleSubmit: () => {
-    const message = $('#message').val();
+    const message = $('#message').val() || ''
     const username = getSearchParam('username')
     const rooms = getSearchParam('rooms')
     app.send({
@@ -66,12 +66,17 @@ const app = {
 const sanitizeResponse = (data) => {
   for(let key in data) {
     var value = data[key]
-    data[key] = String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    data[key] = String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/`/g, '&quot;');
   }
   return data
 }
 
-const capitalizeName = (name) => {
+const capitalizeName = (name = 'anonymous') => {
   return name[0].toUpperCase() + name.slice(1)
 }
 
