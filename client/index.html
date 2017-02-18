@@ -26,6 +26,24 @@
     <div id="main">
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
+      <form action="#" method="POST">
+        Room:
+        <select name='rooms' id="roomselect">
+          <option value='lobby'>Lobby</option>
+          <option value='bathroom'>Bathroom</option>
+          <option value='testing'>Testing</option>
+          <option value='empty'>Empty</option>
+          <option value='staff room'>Staff room</option>
+          <option value='random'>Random</option>
+          <option value='chatroom'>Chatroom</option>
+          <option value='outside'>outside</option>
+        </select>
+        <br><br>
+        <input type='text' name='message'>
+        <div id="send">
+          <input type="submit" class="submit" value="Submit"></input>
+        </div>
+      </form>
     </div>
     <div id="chats"></div>
   </body>
