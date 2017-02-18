@@ -103,3 +103,11 @@ form input[type=text] {
     color: #fff;
     background-color: #0090da;
 }
+
+.small {
+  font-size: .75em;
+}
+
+.message {
+  margin: 10px 0;
+}

@@ -2,18 +2,25 @@ const app = {
   server: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
   init: () => {
   },
-  send: (message) => {
+  send: (data) => {
+    const {username, text, roomname} = data
     $.ajax({
       url: app.server,
       type: 'POST',
-      data: JSON.stringify(message),
+      data: JSON.stringify(data),
       contentType: 'application/json',
-      success: (data) => {
-        app.fetchSingle(data.objectId)
-        console.log(`Message Id: ${data.objectId}, Created at: ${data.createdAt}`);
+      success: (resp) => {
+        app.renderMessage({
+          text: text,
+          username: username,
+          roomname: roomname,
+          createdAt: resp.createdAt,
+          objectId: resp.objectId
+        })
+        console.log(`Message Id: ${resp.objectId}, Created at: ${resp.createdAt}`);
       },
-      error: (data) => {
-        console.error('chatterbox: Failed to send message', data);
+      error: (err) => {
+        console.error('chatterbox: Failed to send message', err);
       }
     })
   },
@@ -24,7 +31,7 @@ const app = {
       data: 'order=-createdAt',
       contentType: 'application/json',
       success: (data) => {
-        for (let i = 0; i < data.results.length; i++) {
+        for (let i = data.results.length - 1; i >= 0; i--) {
           var x = data.results[i]
           var sanitized = sanitizeResponse(x)
           app.renderMessage(sanitized)
@@ -36,26 +43,21 @@ const app = {
       }
     })
   },
-  fetchSingle: (id) => {
-    $.ajax({
-      url: `${app.server}/${id}`,
-      type: 'GET',
-      contentType: 'application/json',
-      success: (data) => {
-        var sanitized = sanitizeResponse(data)
-        app.renderMessage(sanitized)
-        console.log('chatterbox: Message sent');
-      },
-      error: (data) => {
-        console.error('chatterbox: Failed to send message:', data);
-      }
-    })
-  },
   clearMessages: () => {
     $('#chats').html([])
   },
-  renderMessage: ({username, text, roomname}) => {
-    let $msg = $(`<div class="username"><div><span class="usersName">${capitalizeName(username)}</span> in ${roomname} room</div><div>${text}</div></div>`);
+  renderMessage: ({username, text, roomname, createdAt}) => {
+    const timeAgo = $.timeago(createdAt);
+    let $msg = $(`
+      <div class="username">
+        <div>
+          <span class="usersName">${capitalizeName(username)}</span>
+          <span class="small">${timeAgo}</span>
+          <span class="small"> in ${roomname} room</span>
+        </div>
+        <div class="message">${text}</div>
+      </div>
+      `);
     $msg.on('click', app.handleUsernameClick);
     $('#chats').prepend($msg);
   },
@@ -69,11 +71,11 @@ const app = {
   handleSubmit: () => {
     const message = $('#message').val() || ''
     const username = getSearchParam('username')
-    const rooms = getSearchParam('rooms')
+    const room = $('#roomselect option:selected').text() || getSearchParam('rooms')
     app.send({
-      message: message,
+      text: message,
       username: username,
-      rooms: rooms
+      roomname: room
     })
   }
 }
@@ -110,19 +112,7 @@ const getSearchParam = (param) => {
 }
 
 $(document).ready(() => {
-  $('#message').keypress((e) => {
-    if (e.which === 13) {
-      const message = $('#message').val();
-      const username = getSearchParam('username')
-      const rooms = getSearchParam('rooms')
-      app.send({
-        message: message,
-        username: username,
-        rooms: rooms
-      })
-      $('#message').val('')
-    }
-  })
   $("#send .submit").on("click", app.handleSubmit)
+  $("time.timeago").timeago()
   app.fetch()
 })
