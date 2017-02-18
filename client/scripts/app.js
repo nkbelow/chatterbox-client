@@ -150,5 +150,13 @@ $(document).ready(() => {
     let optionSelected = $(e.target).val()
     app.filterMessages(optionSelected);
   })
+  $('#createRoomButton').on('click', () => {
+    let value = $('#roomInput').val();
+    $('#roomselect').append($('<option>', {
+      value: value,
+      text: value,
+    }));
+
+  })
   app.fetch()
 })

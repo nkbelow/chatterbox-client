@@ -33,16 +33,11 @@
         <select name='rooms' id="roomselect">
           <option value='all'>All</option>
           <option value='lobby'>Lobby</option>
-          <option value='bathroom'>Bathroom</option>
-          <option value='testing'>Testing</option>
-          <option value='empty'>Empty</option>
-          <option value='staff room'>Staff room</option>
-          <option value='random'>Random</option>
-          <option value='chatroom'>Chatroom</option>
-          <option value='outside'>outside</option>
         </select>
         <br><br>
-        <input id='message' type='text' name='message' required>
+        <input id='roomInput' type='text' placeholder='Create your own room'></input>
+        <button id='createRoomButton' class="submit"> Create Room</button>
+        <input id='message' type='text' name='message' placeholder="Submit message" required>
         <div id="send">
           <input type="submit" class="submit" value="Submit"></input>
         </div>
