@@ -23,8 +23,12 @@
   </head>
   <body>
     <div id="main">
-      <h1>chatterbox</h1>
+      <div>
+        <img src="images/chick.png" id="logo">
+        <h1 id="title">chatterbox</h1>
+      </div>
       <!-- <form action="#"> -->
+      <div id="messageForm">
         Room:
         <select name='rooms' id="roomselect">
           <option value='lobby'>Lobby</option>
@@ -41,6 +45,7 @@
         <div id="send">
           <input type="submit" class="submit" value="Submit"></input>
         </div>
+      </div>
       <!-- </form> -->
     </div>
     <div id="chats"></div>

@@ -10,13 +10,14 @@ const app = {
       data: JSON.stringify(data),
       contentType: 'application/json',
       success: (resp) => {
-        app.renderMessage({
+        var sanitizeSend = sanitizeResponse({
           text: text,
           username: username,
           roomname: roomname,
           createdAt: resp.createdAt,
           objectId: resp.objectId
-        })
+        });
+        app.renderMessage(sanitizeSend);
         console.log(`Message Id: ${resp.objectId}, Created at: ${resp.createdAt}`);
       },
       error: (err) => {
@@ -50,12 +51,15 @@ const app = {
     const timeAgo = $.timeago(createdAt);
     let $msg = $(`
       <div class="username">
+        <img src="images/egg.png" class="avatar">
         <div>
-          <span class="usersName">${capitalizeName(username)}</span>
-          <span class="small">${timeAgo}</span>
-          <span class="small"> in ${roomname} room</span>
+          <div>
+            <span class="usersName">${capitalizeName(username)}</span>
+            <span class="small">${timeAgo}</span>
+            <span class="small"> in ${roomname} room</span>
+          </div>
+          <div class="message">${text}</div>
         </div>
-        <div class="message">${text}</div>
       </div>
       `);
     $msg.on('click', app.handleUsernameClick);
