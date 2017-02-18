@@ -1,7 +1,7 @@
 const app = {
   server: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
   init: () => {
-    $("#send .submit").bind("submit", app.handleSubmit)
+    //$("#send .submit").bind("submit", app.handleSubmit)
   },
   send: (message) => {
     $.ajax({
@@ -10,9 +10,8 @@ const app = {
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: (data) => {
-        // update UI with new data
-        // use JSON.stringify(data)
-        console.log('chatterbox: Message sent');
+        //app.renderMessage(data);
+        console.log(`Message Id: ${data.objectId}, Created at: ${data.createdAt}`);
       },
       error: (data) => {
         console.error('chatterbox: Failed to send message', data);
@@ -23,15 +22,11 @@ const app = {
     $.ajax({
       url: app.server,
       type: 'GET',
-      //data: JSON.stringify(message),
       contentType: 'application/json',
       success: (data) => {
-        //const sanitized = sanitizeResponse(data)
         for (let i = 0; i < data.results.length; i++) {
           var x = data.results[i]
-          //const parsedJSON = JSON.parse(x)
           var sanitized = sanitizeResponse(x)
-          debugger
           app.renderMessage(sanitized)
         }
         console.log('chatterbox: Message sent');
@@ -45,19 +40,26 @@ const app = {
     $('#chats').html([])
   },
   renderMessage: ({username, text}) => {
-    let $msg = $(`<div class="username">${username}: ${text}</div>`);
+    let $msg = $(`<div class="username"><div class="usersName">${capitalizeName(username)}</div><div>${text}</div></div>`);
     $msg.on('click', app.handleUsernameClick);
-    $('#chats').append($msg);
+    $('#chats').prepend($msg);
   },
   renderRoom: (room) => {
     $('#roomSelect').append(`<div>${room}</div>`);
   },
-  handleUsernameClick: () => {
-    return true;
+  handleUsernameClick: (event) => {
+    const userName = event.currentTarget.childNodes['0'].textContent
+    alert(`You are now following user ${capitalizeName(userName)}`)
   },
-  handleSubmit: (event) => {
-    //app.send(e)
-    console.log(event)
+  handleSubmit: () => {
+    const message = $('#message').val();
+    const username = getSearchParam('username')
+    const rooms = getSearchParam('rooms')
+    app.send({
+      message: message,
+      username: username,
+      rooms: rooms
+    })
   }
 }
 
@@ -69,7 +71,38 @@ const sanitizeResponse = (data) => {
   return data
 }
 
+const capitalizeName = (name) => {
+  return name[0].toUpperCase() + name.slice(1)
+}
+
+const getSearchParam = (param) => {
+  var sPageURL = window.location.search.substring(1);
+  var sURLVariables = sPageURL.split('&')
+  var sParameterName
+
+  for (var i = 0; i < sURLVariables.length; i++) {
+     sParameterName = sURLVariables[i].split('=');
+
+     if (sParameterName[0] === param) {
+         return sParameterName[1] === undefined ? true : sParameterName[1];
+     }
+  }
+}
+
 $(document).ready(() => {
-  //setInterval(app.fetch, 1000)
+  $('#message').keypress((e) => {
+    if (e.which === 13) {
+      const message = $('#message').val();
+      const username = getSearchParam('username')
+      const rooms = getSearchParam('rooms')
+      app.send({
+        message: message,
+        username: username,
+        rooms: rooms
+      })
+      $('#message').val('')
+    }
+  })
+  $("#send .submit").on("click", app.handleSubmit)
   app.fetch()
 })
