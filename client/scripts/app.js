@@ -9,7 +9,7 @@ const app = {
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: (data) => {
-        app.fetch(data.objectId);
+        app.fetchSingle(data.objectId)
         console.log(`Message Id: ${data.objectId}, Created at: ${data.createdAt}`);
       },
       error: (data) => {
@@ -19,7 +19,7 @@ const app = {
   },
   fetch: () => {
     $.ajax({
-      url: url,
+      url: app.server,
       type: 'GET',
       data: 'order=-createdAt',
       contentType: 'application/json',
@@ -29,6 +29,21 @@ const app = {
           var sanitized = sanitizeResponse(x)
           app.renderMessage(sanitized)
         }
+        console.log('chatterbox: Message sent');
+      },
+      error: (data) => {
+        console.error('chatterbox: Failed to send message:', data);
+      }
+    })
+  },
+  fetchSingle: (id) => {
+    $.ajax({
+      url: `${app.server}/${id}`,
+      type: 'GET',
+      contentType: 'application/json',
+      success: (data) => {
+        var sanitized = sanitizeResponse(data)
+        app.renderMessage(sanitized)
         console.log('chatterbox: Message sent');
       },
       error: (data) => {
