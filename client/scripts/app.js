@@ -4,6 +4,8 @@ const app = {
   },
   state: {
     messages: null,
+    user: null,
+    rooms: null,
   },
   send: (data) => {
     const {username, text, roomname} = data
@@ -35,12 +37,9 @@ const app = {
       data: 'order=-createdAt',
       contentType: 'application/json',
       success: (data) => {
-        app.state.messages = data.results
-        for (let i = data.results.length - 1; i >= 0; i--) {
-          var x = data.results[i]
-          var sanitized = sanitizeResponse(x)
-          app.renderMessage(sanitized)
-        }
+        const cleaned = app.sanitizeCollection(data.results)
+        app.state.messages = cleaned
+        app.renderCollection(app.state.messages)
         console.log('chatterbox: Message sent');
       },
       error: (data) => {
@@ -49,14 +48,30 @@ const app = {
     })
   },
   filterMessages: (isRoom) => {
-    app.state.messages.forEach((message) => {
-      if (message.roomname === isRoom) {
-        var sanitized = sanitizeResponse(message);
-        app.renderMessage(sanitized);
-      }
-    })
+    if (isRoom === "all") {
+      app.sanitizeCollection(app.state.messages)
+      app.renderCollection(app.state.messages)
+    } else {
+      app.state.messages.forEach((message) => {
+        if (message.roomname === isRoom) {
+          app.renderMessage(message);
+        }
+      })
+  }
   },
-
+  sanitizeCollection: (collection) => {
+    for (let i = collection.length - 1; i >= 0; i--) {
+      var x = sanitizeResponse(collection[i])
+      collection[i] = x
+    }
+    return collection
+  },
+  renderCollection: (collection) => {
+    for (let i = collection.length - 1; i >= 0; i--) {
+      var x = collection[i]
+      app.renderMessage(x)
+    }
+  },
   clearMessages: () => {
     $('#chats').html([])
   },
