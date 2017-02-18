@@ -2,6 +2,9 @@ const app = {
   server: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
   init: () => {
   },
+  state: {
+    messages: null,
+  },
   send: (data) => {
     const {username, text, roomname} = data
     $.ajax({
@@ -32,6 +35,7 @@ const app = {
       data: 'order=-createdAt',
       contentType: 'application/json',
       success: (data) => {
+        app.state.messages = data.results
         for (let i = data.results.length - 1; i >= 0; i--) {
           var x = data.results[i]
           var sanitized = sanitizeResponse(x)
@@ -44,6 +48,15 @@ const app = {
       }
     })
   },
+  filterMessages: (isRoom) => {
+    app.state.messages.forEach((message) => {
+      if (message.roomname === isRoom) {
+        var sanitized = sanitizeResponse(message);
+        app.renderMessage(sanitized);
+      }
+    })
+  },
+
   clearMessages: () => {
     $('#chats').html([])
   },
@@ -62,7 +75,7 @@ const app = {
         </div>
       </div>
       `);
-    $msg.on('click', app.handleUsernameClick);
+    $msg.find('span.usersName').on('click', app.handleUsernameClick);
     $('#chats').prepend($msg);
   },
   renderRoom: (room) => {
@@ -117,6 +130,10 @@ const getSearchParam = (param) => {
 
 $(document).ready(() => {
   $("#send .submit").on("click", app.handleSubmit)
-  $("time.timeago").timeago()
+  $('#roomselect').on('change', (e) => {
+    app.clearMessages();
+    let optionSelected = $(e.target).val()
+    app.filterMessages(optionSelected);
+  })
   app.fetch()
 })

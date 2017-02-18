@@ -86,12 +86,16 @@ input[type=submit] {
   border-radius: 4px;
   padding: 15px;
   box-shadow: 2px 2px 3px 0 #ccc;
-  cursor: pointer;
 }
 
 .usersName {
   font-weight: 800;
   padding: 0 0 10px 0;
+  cursor: pointer;
+}
+
+.usersName:hover {
+  color: #1da1f2;
 }
 
 .chat {
