@@ -4,7 +4,7 @@ const app = {
   },
   state: {
     messages: null,
-    user: null,
+    users: [],
     rooms: null,
   },
   send: (data) => {
@@ -60,7 +60,6 @@ const app = {
   },
   filterUser: (userName) => {
     app.state.messages.forEach((message) => {
-      debugger
       if (message.username === userName) {
         app.renderMessage(message);
       }
@@ -111,6 +110,14 @@ const app = {
     // input user data
     // append all user's messages to feed
     app.clearMessages();
+    $('#messageForm').hide();
+    // create h1 with class user-header
+    $('#main').append(`
+      <div id='userHeader'>
+       <h1 id='userHeaderName'>${userName}</h1>
+       <a href="#" value=${userName}>Follow me!</a>
+      </div>
+    `)
     app.filterUser(userName);
   },
   handleSubmit: () => {
@@ -156,6 +163,16 @@ const getSearchParam = (param) => {
      }
   }
 }
+//
+// const reformatUser = (obj) => {
+//   let newObj = {}
+//   newObj.username = obj.username
+//   newObj.followers = []
+//   newObj.following = []
+//   newObj.messages = []
+//   newObj.messages.push(obj)
+//   return newObj
+// }
 
 
 
@@ -176,7 +193,14 @@ $(document).ready(() => {
   $('#header-image').on('click', () => {
     app.clearMessages()
     app.renderCollection(app.state.messages)
+    $('#messageForm').show();
+    $('#userHeader').remove();
+    // hide user-header
   })
+  $('#main').on('click', 'a', (e) => {
+    alert(`You are now following the user`);
+  })
+
 
   app.fetch()
 })

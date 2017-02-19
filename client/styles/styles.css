@@ -16,6 +16,12 @@ body {
     border-width: 0 1px 1px 1px;
 }
 
+a {
+  font-weight: 800;
+  text-decoration: none;
+  color: #1853c7;
+}
+
 #main {
   background-color: #1da1f2;
 }
@@ -168,4 +174,9 @@ input[type=submit], button.submit {
 
 #header-image:hover {
   color: #ccc;
+}
+
+#userHeader {
+  color: #fff;
+  text-align: right;
 }
