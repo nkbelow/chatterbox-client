@@ -157,3 +157,15 @@ input[type=submit], button.submit {
 #messageForm {
   clear: both;
 }
+
+.clear {
+  clear: both;
+}
+
+#header-image {
+  cursor: pointer;
+}
+
+#header-image:hover {
+  color: #ccc;
+}

@@ -49,7 +49,6 @@ const app = {
   },
   filterMessages: (isRoom) => {
     if (isRoom === "all") {
-      app.sanitizeCollection(app.state.messages)
       app.renderCollection(app.state.messages)
     } else {
       app.state.messages.forEach((message) => {
@@ -58,6 +57,14 @@ const app = {
         }
       })
   }
+  },
+  filterUser: (userName) => {
+    app.state.messages.forEach((message) => {
+      debugger
+      if (message.username === userName) {
+        app.renderMessage(message);
+      }
+    })
   },
   sanitizeCollection: (collection) => {
     for (let i = collection.length - 1; i >= 0; i--) {
@@ -82,12 +89,13 @@ const app = {
         <img src="images/egg.png" class="avatar">
         <div>
           <div>
-            <span class="usersName">${capitalizeName(username)}</span>
+            <span class="usersName">${username}</span>
             <span class="small">${timeAgo}</span>
             <span class="small"> in ${roomname} room</span>
           </div>
           <div class="message">${text}</div>
         </div>
+        <div class="clear"></div>
       </div>
       `);
     $msg.find('span.usersName').on('click', app.handleUsernameClick);
@@ -98,7 +106,12 @@ const app = {
   },
   handleUsernameClick: (event) => {
     const userName = event.currentTarget.childNodes['0'].textContent
-    alert(`You are now following user ${capitalizeName(userName)}`)
+    // clearMessages()
+    // hide header layout
+    // input user data
+    // append all user's messages to feed
+    app.clearMessages();
+    app.filterUser(userName);
   },
   handleSubmit: () => {
     const message = $('#message').val() || ''
@@ -116,7 +129,7 @@ const sanitizeResponse = (data) => {
   for(let key in data) {
     var value = data[key]
     data[key] = String(value)
-      .replace(/&/g, '&amp;')
+      //.replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
@@ -125,9 +138,10 @@ const sanitizeResponse = (data) => {
   return data
 }
 
-const capitalizeName = (name = 'anonymous') => {
-  return name[0].toUpperCase() + name.slice(1)
-}
+// const capitalizeName = (name = 'anonymous') => {
+//   if (name === '') return
+//   return name[0].toUpperCase() + name.slice(1)
+// }
 
 const getSearchParam = (param) => {
   var sPageURL = window.location.search.substring(1);
@@ -143,6 +157,8 @@ const getSearchParam = (param) => {
   }
 }
 
+
+
 $(document).ready(() => {
   $("#send .submit").on("click", app.handleSubmit)
   $('#roomselect').on('change', (e) => {
@@ -156,7 +172,11 @@ $(document).ready(() => {
       value: value,
       text: value,
     }));
-
   })
+  $('#header-image').on('click', () => {
+    app.clearMessages()
+    app.renderCollection(app.state.messages)
+  })
+
   app.fetch()
 })
